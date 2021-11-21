@@ -1,4 +1,8 @@
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -13,10 +17,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   TextEditingController selfIntroductionController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
+  File? image;
+  ImagePicker picker = ImagePicker();
 
-
-
-
+  Future<void> getImageFromGallery() async{
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if(pickedFile != null) {
+      setState(() {
+        image = File(pickedFile.path);
+      });
+    }
+  }
 
 
   @override
@@ -45,10 +56,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           child: Column(
             children: [
               SizedBox(height: 30),
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.amberAccent.withOpacity(0.5),
-                child: Icon(Icons.add, color: Colors.deepOrange.withOpacity(0.7),),
+              GestureDetector(
+                onTap: () {
+                  getImageFromGallery();
+                },
+                child: CircleAvatar(
+                  foregroundImage: image == null ? null : FileImage(image!),
+                  radius: 40,
+                  backgroundColor: Colors.brown,
+                  child: Icon(Icons.add, color: Colors.brown.shade50),
+                ),
               ),
               SizedBox(height: 20),
               Container(
@@ -103,7 +120,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     userIdController.text.isNotEmpty &&
                     selfIntroductionController.text.isNotEmpty &&
                     emailController.text.isNotEmpty &&
-                    passController.text.isNotEmpty
+                    passController.text.isNotEmpty &&
+                    image != null
                     ) {
                       Navigator.pop(context);
                     }
