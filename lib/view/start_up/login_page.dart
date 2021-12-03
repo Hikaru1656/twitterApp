@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:twitter_demo/utils/authentication.dart';
+import 'package:twitter_demo/utils/firestore/users.dart';
 import 'package:twitter_demo/view/screen.dart';
 import 'package:twitter_demo/view/start_up/create_account_page.dart';
 
@@ -65,8 +68,14 @@ class _LoginPageState extends State<LoginPage> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.brown,
                 ),
-                  onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Screen()));
+                  onPressed: () async{
+                    var result = await Authentication.emailSignIn(email: emailController.text, pass: passController.text);
+                    if(result is UserCredential) {
+                      var _result = await UserFirestore.getUser(result.user!.uid);
+                      if(_result == true) {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Screen()));
+                      }
+                   }
                   },
                   child: Text('emailでログイン')
               ),

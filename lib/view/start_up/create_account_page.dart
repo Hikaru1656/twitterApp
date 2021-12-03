@@ -1,8 +1,15 @@
 
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:twitter_demo/model/account.dart';
+import 'package:twitter_demo/utils/authentication.dart';
+import 'package:twitter_demo/utils/firestore/users.dart';
+import 'package:twitter_demo/utils/function_utils.dart';
+import 'package:twitter_demo/utils/widget_utils.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -18,38 +25,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
   File? image;
-  ImagePicker picker = ImagePicker();
-
-  Future<void> getImageFromGallery() async{
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if(pickedFile != null) {
-      setState(() {
-        image = File(pickedFile.path);
-      });
-    }
-  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(56),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.black87,
-                elevation: 0.5,
-                title: Text('アカウント作成',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      appBar: WidgetUtils.createAppBar('アカウント作成'),
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
@@ -57,9 +38,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             children: [
               SizedBox(height: 30),
               GestureDetector(
-                onTap: () {
-                  getImageFromGallery();
-                },
+                onTap: () async{
+                  var result = await FunctionUtils.getImageFromGallery();
+                  if(result != null) {
+                    setState(() {
+                      image = File(result.path);
+                    });
+                  }
+                  },
                 child: CircleAvatar(
                   foregroundImage: image == null ? null : FileImage(image!),
                   radius: 40,
@@ -114,7 +100,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.black87,
                 ),
-                  onPressed: () {
+                  onPressed: () async{
                     if(
                     nameController.text.isNotEmpty &&
                     userIdController.text.isNotEmpty &&
@@ -123,7 +109,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     passController.text.isNotEmpty &&
                     image != null
                     ) {
-                      Navigator.pop(context);
+                      var result = await Authentication.signUp(email: emailController.text, pass: passController.text);
+                      if(result is UserCredential) {
+                        String imagePath = await FunctionUtils.uploadImage(result.user!.uid, image!);
+                        Account newAccount = Account(
+                          id: result.user!.uid,
+                          name: nameController.text,
+                          userId: userIdController.text,
+                          selfIntroduction: selfIntroductionController.text,
+                          imagePath: imagePath,
+                        );
+                        var _result = await UserFirestore.setUser(newAccount);
+                        if(_result == true) {
+                          Navigator.pop(context);
+                        }
+                      }
                     }
                   },
                   child: Text('アカウントを作成'),

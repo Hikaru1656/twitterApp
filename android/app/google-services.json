@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "5836528656",
+    "project_id": "twitter-demo-b5b8a",
+    "storage_bucket": "twitter-demo-b5b8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5836528656:android:540bf8ef8ba52090d17e95",
+        "android_client_info": {
+          "package_name": "com.example.twitter_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5836528656-94tu1ocbsic6em5qhlcf9atlugir5hs8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDveNAjmNBXMFOJI9DLrauLZQyWC0HLUBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5836528656-94tu1ocbsic6em5qhlcf9atlugir5hs8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

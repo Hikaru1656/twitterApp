@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:twitter_demo/model/account.dart';
 import 'package:twitter_demo/model/post.dart';
+import 'package:twitter_demo/utils/authentication.dart';
+import 'package:twitter_demo/view/account/edit_account_page.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -11,15 +14,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  Account myAccount = Account(
-    id: '1',
-    name: 'hipomaru',
-    selfIntroduction: 'こんにちは',
-    userId: 'dgafjiagrfi',
-    imagePath: 'https://beefup.work/wp-content/uploads/2019/10/logo_lockup_flutter_horizontal.png',
-    createdTime: DateTime.now(),
-    updatedTime: DateTime.now(),
-  );
+  Account myAccount = Authentication.myAccount!;
 
   List<Post> postList = [
     Post(
@@ -78,7 +73,14 @@ class _AccountPageState extends State<AccountPage> {
                               ],
                             ),
                             OutlinedButton(
-                              onPressed: () {},
+                              onPressed: () async{
+                                var result = await Navigator.push(context, MaterialPageRoute(builder: (context) => EditAccountPage()));
+                                if(result == true) {
+                                  setState(() {
+                                    myAccount = Authentication.myAccount!;
+                                  });
+                                }
+                              },
                               child: Text('編集'),
                             ),
                           ],
